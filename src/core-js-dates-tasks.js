@@ -32,8 +32,10 @@ function dateToTimestamp(date) {
  * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
  */
 function getTime(date) {
-  const event = new Date(date);
-  return event.toLocaleTimeString();
+  const hh = date.getHours().toString().padStart(2, '0');
+  const mm = date.getMinutes().toString().padStart(2, '0');
+  const ss = date.getSeconds().toString().padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
 }
 
 /**
@@ -277,8 +279,34 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function inputData(str) {
+  const data = str.split('-');
+  return [data[2], data[1] - 1, data[0]];
+}
+
+function outputData(date) {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${day}-${month}-${year}`;
+}
+
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const start = new Date(...inputData(period.start));
+  const end = new Date(...inputData(period.end));
+  let workDay = 1;
+  const scheldule = [];
+  while (start <= end) {
+    scheldule.push(outputData(start));
+    workDay += 1;
+    if (workDay > countWorkDays) {
+      workDay = 1;
+      start.setDate(start.getDate() + 1 + countOffDays);
+    } else {
+      start.setDate(start.getDate() + 1);
+    }
+  }
+  return scheldule;
 }
 
 /**
